@@ -37,18 +37,22 @@ useUpdateLocation()
   useGetItemsByCity()
   useGetMyOrders()
 
-  useEffect(()=>{
-const socketInstance=io(serverUrl,{withCredentials:true})
-dispatch(setSocket(socketInstance))
-socketInstance.on('connect',()=>{
-if(userData){
-  socketInstance.emit('identity',{userId:userData._id})
-}
-})
-return ()=>{
-  socketInstance.disconnect()
-}
-  },[userData?._id])
+useEffect(() => {
+ 
+  if (!userData?._id) return;
+
+  const socketInstance = io(serverUrl, { withCredentials: true });
+  dispatch(setSocket(socketInstance));
+
+  socketInstance.on('connect', () => {
+    socketInstance.emit('identity', { userId: userData._id });
+  });
+
+  return () => {
+    socketInstance.disconnect();
+    dispatch(setSocket(null)); 
+  };
+}, [userData?._id]);
 
   return (
    <Routes>
